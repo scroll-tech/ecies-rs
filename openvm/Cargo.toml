@@ -1,0 +1,33 @@
+[workspace]
+members = [
+  "program",
+  "script",
+]
+resolver = "2"
+
+[workspace.dependencies]
+bitcode = "0.6"
+clap = "*"
+ecies = { path = ".." }
+toml = "*"
+tracing = "*"
+
+openvm = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
+openvm-algebra-guest = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97", default-features = false }
+openvm-benchmarks-prove = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
+openvm-circuit = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
+openvm-ecc-guest = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97", default-features = false }
+openvm-k256 = { git = "https://github.com/lightsing/openvm.git", package = "k256", rev = "f834efa186784cfdb0401c8596e1264cc9030f97", features = ["std"] }
+openvm-sdk = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
+openvm-sha2 = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
+
+#openvm = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
+#openvm-circuit = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
+#openvm-sdk = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
+#openvm-k256 = { git = "https://github.com/openvm-org/openvm.git", package = "k256", rev = "ca36de3803213da664b03d111801ab903d55e360", features = ["std"] }
+#openvm-sha2 = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
+#openvm-algebra-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360", default-features = false }
+#openvm-ecc-guest = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360", default-features = false }
+#openvm-benchmarks-prove = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
+
+openvm-stark-sdk = { git = "https://github.com/openvm-org/stark-backend.git", rev = "cd39ed46e424db131cd3cd5cc50660af850cdf8d" }

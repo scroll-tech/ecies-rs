@@ -1,0 +1,29 @@
+[package]
+edition = "2024"
+license = "MIT"
+name = "ecies"
+version = "0.1.0"
+
+[dependencies]
+aes-gcm = "=0.11.0-rc.0"
+digest = "0.10"
+hkdf = "0.12"
+rand_core = { version = "0.9", optional = true }
+
+[dev-dependencies]
+hex = "0.4"
+rand = "0.9"
+reqwest = { version = "0.12", features = ["blocking", "rustls-tls-webpki-roots"] }
+
+[target.'cfg(not(target_os = "zkvm"))'.dependencies]
+k256 = "0.13"
+sha2 = "0.10"
+
+[target.'cfg(all(target_os = "zkvm", not(target_vendor = "succinct"), target_arch = "riscv32"))'.dependencies]
+#openvm-k256 = { package = "k256", git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360", features = ["std"] }
+#openvm-sha2 = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
+openvm-k256 = { git = "https://github.com/lightsing/openvm.git", package = "k256", rev = "f834efa186784cfdb0401c8596e1264cc9030f97", features = ["std"] }
+openvm-sha2 = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
+
+[features]
+rand = ["dep:rand_core"]

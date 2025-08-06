@@ -1,0 +1,18 @@
+[package]
+edition = "2021"
+name = "ecies-script"
+version = "0.1.0"
+
+[dependencies]
+bitcode.workspace = true
+clap.workspace = true
+ecies = { workspace = true, features = ["rand"] }
+openvm-benchmarks-prove.workspace = true
+openvm-circuit.workspace = true
+openvm-sdk.workspace = true
+openvm-stark-sdk.workspace = true
+rand = "0.9"
+toml.workspace = true
+tracing.workspace = true
+
+[features]
