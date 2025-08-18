@@ -19,7 +19,7 @@ fn main() {
     let public_key = secret_key.public_key();
     let address: [u8; 20] = rand::random();
     let ciphertext = public_key.encrypt(&mut rand::rng(), &address);
-    let decrypted = secret_key.decrypt(&ciphertext);
+    let decrypted = secret_key.try_decrypt(&ciphertext).unwrap();
     assert_eq!(decrypted, address);
     println!("[+] address: {:?}", address);
     println!("[+] encrypted address length: {}", ciphertext.len());

@@ -313,6 +313,7 @@ dependencies = [
  "rand_core 0.9.3",
  "reqwest",
  "sha2",
+ "thiserror",
 ]
 
 [[package]]

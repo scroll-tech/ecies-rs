@@ -13,13 +13,41 @@ const TESTING_RECEIVER_PRIVKEY: [u8; 32] = [
 ];
 
 #[test]
+fn test_kem() {
+    let mut derived = [0u8; 32];
+    Hkdf::<Sha256>::new(None, b"secret")
+        .expand(b"", &mut derived)
+        .unwrap();
+
+    assert_eq!(
+        hex::encode(&derived),
+        "2f34e5ff91ec85d53ca9b543683174d0cf550b60d5f52b24c97b386cfcf6cbbf"
+    );
+
+    let mut k1 = [0u8; 32];
+    k1[31] = 2;
+    let mut k2 = [0u8; 32];
+    k2[31] = 3;
+    let k1 = SecretKey::try_from_bytes(&k1).unwrap();
+    let k2 = SecretKey::try_from_bytes(&k2).unwrap();
+    let sk1 = k1.encapsulate(&k2.public_key());
+    let sk2 = k1.public_key().decapsulate(&k2);
+    assert_eq!(sk1, sk2);
+
+    assert_eq!(
+        hex::encode(sk1),
+        "6f982d63e8590c9d9b5b4c1959ff80315d772edd8f60287c9361d548d5200f82"
+    );
+}
+
+#[test]
 #[cfg(feature = "rand")]
 fn test_encrypt_and_decrypt() {
-    let receiver_sk = SecretKey::from_bytes(TESTING_RECEIVER_PRIVKEY).unwrap();
+    let receiver_sk = SecretKey::try_from_bytes(TESTING_RECEIVER_PRIVKEY).unwrap();
     let receiver_pk = receiver_sk.public_key();
 
     let mut ciphertext = receiver_pk.encrypt(&mut rand::rng(), TESTING_MESSAGE.as_bytes());
-    let decrypted_msg = receiver_sk.decrypt_inplace(&mut ciphertext);
+    let decrypted_msg = receiver_sk.try_decrypt_inplace(&mut ciphertext).unwrap();
     assert_eq!(decrypted_msg, TESTING_MESSAGE.as_bytes());
 }
 
@@ -29,7 +57,7 @@ fn test_public_key_decompression() {
     let secret_key = SecretKey::random(&mut rand::rng());
     let public_key = secret_key.public_key();
 
-    PublicKey::from_bytes(&public_key.to_bytes(true)).unwrap();
+    PublicKey::try_from_bytes(&public_key.to_bytes(true)).unwrap();
 }
 
 #[test]
@@ -50,8 +78,8 @@ fn test_decrypt_against_python_version() {
 
     let mut ciphertext = hex::decode(&response).unwrap();
     let receiver_sk =
-        SecretKey::from_bytes(hex::decode(TESTING_RECEIVER_PRIVKEY_HEX).unwrap()).unwrap();
-    let decrypted_msg = receiver_sk.decrypt_inplace(&mut ciphertext);
+        SecretKey::try_from_bytes(hex::decode(TESTING_RECEIVER_PRIVKEY_HEX).unwrap()).unwrap();
+    let decrypted_msg = receiver_sk.try_decrypt_inplace(&mut ciphertext).unwrap();
     assert_eq!(decrypted_msg, TESTING_MESSAGE.as_bytes());
 }
 
@@ -59,7 +87,7 @@ fn test_decrypt_against_python_version() {
 #[cfg(feature = "rand")]
 fn test_encrypt_against_python_version() {
     let receiver_pk =
-        PublicKey::from_bytes(hex::decode(TESTING_RECEIVER_PUBKEY_HEX).unwrap()).unwrap();
+        PublicKey::try_from_bytes(hex::decode(TESTING_RECEIVER_PUBKEY_HEX).unwrap()).unwrap();
     let ciphertext = receiver_pk.encrypt(&mut rand::rng(), TESTING_MESSAGE.as_bytes());
 
     let mut params = HashMap::new();

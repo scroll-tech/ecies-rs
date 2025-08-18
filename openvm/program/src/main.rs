@@ -10,19 +10,18 @@ fn main() {
     let baseline = openvm::io::read::<bool>();
 
     let sk = openvm::io::read_vec();
-    let sk = SecretKey::from_bytes(&sk).unwrap();
+    let sk = SecretKey::try_from_bytes(&sk).unwrap();
     let ciphertext = openvm::io::read_vec();
 
-    let address: [u8; 20] = sk.decrypt(&ciphertext).try_into().unwrap();
+    let address: [u8; 20] = sk.try_decrypt(&ciphertext).unwrap().try_into().unwrap();
 
     for _ in 0..repetitions {
-        let mut ciphertext = ciphertext.clone();
         if !baseline {
-            black_box(sk.decrypt_inplace(black_box(&mut ciphertext)));
+            black_box(sk.try_decrypt(black_box(&ciphertext)).unwrap());
         } else {
-            black_box(&mut ciphertext);
+            black_box(&ciphertext);
         }
-        black_box(ciphertext);
+        black_box(&ciphertext);
     }
 
     let mut out: [u8; 32] = [0u8; 32];
