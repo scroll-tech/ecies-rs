@@ -8,9 +8,6 @@ use sha256::Sha256;
 #[cfg(test)]
 mod tests;
 
-#[cfg(target_os = "zkvm")]
-use openvm_k256 as k256;
-
 use aes_gcm::{AeadInOut, AesGcm, Key, KeyInit, Tag, aead::consts::U16, aes::Aes256, aead};
 use hkdf::Hkdf;
 use k256::{
