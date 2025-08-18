@@ -853,7 +853,6 @@ version = "0.16.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee27f32b5c5292967d2d4a9d7f1e0b0aed2c15daded5a60300e4abb9d8020bca"
 dependencies = [
- "der",
  "digest",
  "elliptic-curve",
  "rfc6979",
@@ -868,8 +867,7 @@ dependencies = [
  "aes-gcm",
  "digest",
  "hkdf",
- "k256 0.13.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "k256 0.13.4 (git+https://github.com/lightsing/openvm.git?rev=f834efa186784cfdb0401c8596e1264cc9030f97)",
+ "k256",
  "openvm-sha2",
  "rand_core 0.9.3",
  "sha2",
@@ -881,7 +879,7 @@ name = "ecies-program"
 version = "0.1.0"
 dependencies = [
  "ecies",
- "k256 0.13.4 (git+https://github.com/lightsing/openvm.git?rev=f834efa186784cfdb0401c8596e1264cc9030f97)",
+ "k256",
  "openvm",
  "openvm-algebra-guest",
  "openvm-ecc-guest",
@@ -1446,20 +1444,6 @@ dependencies = [
 [[package]]
 name = "k256"
 version = "0.13.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6e3919bbaa2945715f0bb6d3934a173d1e9a59ac23767fbaaef277265a7411b"
-dependencies = [
- "cfg-if",
- "ecdsa",
- "elliptic-curve",
- "once_cell",
- "sha2",
- "signature",
-]
-
-[[package]]
-name = "k256"
-version = "0.13.4"
 source = "git+https://github.com/lightsing/openvm.git?rev=f834efa186784cfdb0401c8596e1264cc9030f97#f834efa186784cfdb0401c8596e1264cc9030f97"
 dependencies = [
  "ecdsa",
@@ -1871,7 +1855,7 @@ dependencies = [
  "derive-new 0.6.0",
  "derive_more 1.0.0",
  "eyre",
- "k256 0.13.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "k256",
  "num-bigint 0.4.6",
  "openvm-algebra-circuit",
  "openvm-algebra-transpiler",

@@ -31,3 +31,6 @@ openvm-sha2 = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa1
 #openvm-benchmarks-prove = { git = "https://github.com/openvm-org/openvm.git", rev = "ca36de3803213da664b03d111801ab903d55e360" }
 
 openvm-stark-sdk = { git = "https://github.com/openvm-org/stark-backend.git", rev = "cd39ed46e424db131cd3cd5cc50660af850cdf8d" }
+
+[patch.crates-io]
+k256 = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
