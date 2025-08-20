@@ -18,8 +18,5 @@ hex = "0.4"
 rand = "0.9"
 reqwest = { version = "0.12", features = ["blocking", "rustls-tls-webpki-roots"] }
 
-[target.'cfg(all(target_os = "zkvm", not(target_vendor = "succinct"), target_arch = "riscv32"))'.dependencies]
-openvm-sha2 = { git = "https://github.com/lightsing/openvm.git", rev = "f834efa186784cfdb0401c8596e1264cc9030f97" }
-
 [features]
 rand = ["dep:rand_core"]

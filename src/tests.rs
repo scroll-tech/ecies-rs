@@ -15,7 +15,7 @@ const TESTING_RECEIVER_PRIVKEY: [u8; 32] = [
 #[test]
 fn test_kem() {
     let mut derived = [0u8; 32];
-    Hkdf::<Sha256>::new(None, b"secret")
+    Hkdf::<sha256::Sha256>::new(None, b"secret")
         .expand(b"", &mut derived)
         .unwrap();
 
@@ -49,6 +49,18 @@ fn test_encrypt_and_decrypt() {
     let mut ciphertext = receiver_pk.encrypt(&mut rand::rng(), TESTING_MESSAGE.as_bytes());
     let decrypted_msg = receiver_sk.try_decrypt_inplace(&mut ciphertext).unwrap();
     assert_eq!(decrypted_msg, TESTING_MESSAGE.as_bytes());
+}
+
+#[test]
+#[cfg(feature = "rand")]
+fn test_encrypt_and_decrypt_address() {
+    let receiver_sk = SecretKey::try_from_bytes(TESTING_RECEIVER_PRIVKEY).unwrap();
+    let receiver_pk = receiver_sk.public_key();
+
+    let address: [u8; 20] = rand::random();
+    let mut ciphertext = receiver_pk.encrypt(&mut rand::rng(), address);
+    let decrypted_msg = receiver_sk.try_decrypt_inplace(&mut ciphertext).unwrap();
+    assert_eq!(decrypted_msg, address);
 }
 
 #[test]

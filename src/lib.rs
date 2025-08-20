@@ -1,14 +1,11 @@
-#[cfg(target_os = "zkvm")]
-mod sha256;
-#[cfg(not(target_os = "zkvm"))]
-use sha2::Sha256;
-#[cfg(target_os = "zkvm")]
-use sha256::Sha256;
+extern crate core;
+
+pub mod sha256;
 
 #[cfg(test)]
 mod tests;
 
-use aes_gcm::{AeadInOut, AesGcm, Key, KeyInit, Tag, aead::consts::U16, aes::Aes256, aead};
+use aes_gcm::{AeadInOut, AesGcm, Key, KeyInit, Tag, aead, aead::consts::U16, aes::Aes256};
 use hkdf::Hkdf;
 use k256::{
     Secp256k1,
@@ -110,7 +107,7 @@ impl PublicKey {
         let shared_point = elliptic_curve::PublicKey::<Secp256k1>::from_affine(
             elliptic_curve::group::Curve::to_affine(&(self.0.to_projective() * tweak.as_ref())),
         )
-            .unwrap();
+        .unwrap();
 
         get_shared_secret(&self.0, &shared_point)
     }
@@ -146,35 +143,26 @@ impl SecretKey {
     pub fn try_decrypt<'a>(&self, ciphertext: &[u8]) -> Result<Vec<u8>, DecryptError> {
         let (ephemeral_pk, nonce, tag, buffer) = split_ciphertext(ciphertext)?;
         let mut buffer = buffer.to_vec();
-        self.decrypt_inner(
-            ephemeral_pk,
-            &nonce,
-            &tag,
-            buffer.as_mut_slice(),
-        )?;
+        self.decrypt_inner(ephemeral_pk, &nonce, &tag, buffer.as_mut_slice())?;
         Ok(buffer)
     }
 
-    pub fn try_decrypt_fixed<'a, const N: usize>(&self, ciphertext: &[u8]) -> Result<[u8; N], DecryptError> {
+    pub fn try_decrypt_fixed<'a, const N: usize>(
+        &self,
+        ciphertext: &[u8],
+    ) -> Result<[u8; N], DecryptError> {
         let (ephemeral_pk, nonce, tag, buffer) = split_ciphertext(ciphertext)?;
         let mut buffer: [u8; N] = buffer.try_into().unwrap();
-        self.decrypt_inner(
-            ephemeral_pk,
-            &nonce,
-            &tag,
-            buffer.as_mut_slice(),
-        )?;
+        self.decrypt_inner(ephemeral_pk, &nonce, &tag, buffer.as_mut_slice())?;
         Ok(buffer)
     }
 
-    pub fn try_decrypt_inplace<'a>(&self, ciphertext: &'a mut [u8]) -> Result<&'a mut [u8], DecryptError> {
+    pub fn try_decrypt_inplace<'a>(
+        &self,
+        ciphertext: &'a mut [u8],
+    ) -> Result<&'a mut [u8], DecryptError> {
         let (ephemeral_pk, nonce, tag, buffer) = split_ciphertext_mut(ciphertext)?;
-        self.decrypt_inner(
-            ephemeral_pk,
-            &nonce,
-            &tag,
-            buffer,
-        )?;
+        self.decrypt_inner(ephemeral_pk, &nonce, &tag, buffer)?;
         Ok(buffer)
     }
 
@@ -183,7 +171,7 @@ impl SecretKey {
         let shared_point = elliptic_curve::PublicKey::<Secp256k1>::from_affine(
             elliptic_curve::group::Curve::to_affine(&(peer_pk.0.to_projective() * tweak.as_ref())),
         )
-            .unwrap();
+        .unwrap();
 
         get_shared_secret(&self.public_key().0, &shared_point)
     }
@@ -199,8 +187,7 @@ impl SecretKey {
         let shared_secret = ephemeral_pk.decapsulate(self);
         let cipher = Aes256Gcm::new(&shared_secret);
 
-        cipher
-            .decrypt_inout_detached(nonce, b"", buffer.into(), tag)?;
+        cipher.decrypt_inout_detached(nonce, b"", buffer.into(), tag)?;
         Ok(())
     }
 }
@@ -217,7 +204,7 @@ fn get_shared_secret(
     secret[UNCOMPRESSED_PUBLIC_KEY_SIZE..]
         .copy_from_slice(shared_point.to_encoded_point(false).as_ref());
 
-    let h = Hkdf::<Sha256>::new(None, &secret);
+    let h = Hkdf::<sha256::Sha256>::new(None, &secret);
     let mut shared_secret = [0u8; 32];
     h.expand(b"", &mut shared_secret).unwrap();
 
@@ -231,8 +218,7 @@ fn split_ciphertext(ciphertext: &[u8]) -> Result<(PublicKey, Nonce, Tag, &[u8]),
     }
 
     let (ephemeral_pk_bytes, remaining) = ciphertext.split_at(UNCOMPRESSED_PUBLIC_KEY_SIZE);
-    let ephemeral_pk =
-        PublicKey::try_from_bytes(ephemeral_pk_bytes)?;
+    let ephemeral_pk = PublicKey::try_from_bytes(ephemeral_pk_bytes)?;
 
     let (nonce, remaining) = remaining.split_at(NONCE_SIZE);
     let nonce = Nonce::try_from(nonce).map_err(|_| DecryptError::InvalidNonce)?;
@@ -242,7 +228,9 @@ fn split_ciphertext(ciphertext: &[u8]) -> Result<(PublicKey, Nonce, Tag, &[u8]),
 }
 
 #[inline]
-fn split_ciphertext_mut(ciphertext: &mut [u8]) -> Result<(PublicKey, Nonce, Tag, &mut [u8]), DecryptError> {
+fn split_ciphertext_mut(
+    ciphertext: &mut [u8],
+) -> Result<(PublicKey, Nonce, Tag, &mut [u8]), DecryptError> {
     if ciphertext.len() < UNCOMPRESSED_PUBLIC_KEY_SIZE + NONCE_SIZE + TAG_SIZE {
         return Err(DecryptError::InvalidLength);
     }
