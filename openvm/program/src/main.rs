@@ -1,5 +1,4 @@
 use std::hint::black_box;
-use openvm_k256::Secp256k1Point;
 use ecies::SecretKey;
 
 openvm::entry!(main);
@@ -12,6 +11,13 @@ fn main() {
     let sk = openvm::io::read_vec();
     let sk = SecretKey::try_from_bytes(&sk).unwrap();
     let ciphertext = openvm::io::read_vec();
+
+    ecies::sha256::set_digest_provider(|| {
+        Box::new(ecies::sha256::ext::ExtSha256Core::new(
+            openvm_sha2::set_sha256,
+        ))
+    })
+        .unwrap();
 
     let address: [u8; 20] = sk.try_decrypt(&ciphertext).unwrap().try_into().unwrap();
 
